@@ -6,10 +6,13 @@ verify_ssl = true
 [dev-packages]
 pytest="*"
 awscli-local="*"
+my-package = {editable = true, path = "."}
 
 [packages]
 boto3="*"
 kinesis-python="*"
+pymysql="*"
+elasticsearch="*"
 
 [requires]
 python_version = "3.7.7"

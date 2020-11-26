@@ -56,7 +56,7 @@ except Exception as e:
 
 cmd = """
 awslocal dynamodb create-table \
-    --table-name bexh-outgoing-events-manager \
+    --table-name bexh-event-connector-manager \
     --attribute-definitions AttributeName=shard,AttributeType=S \
     --key-schema AttributeName=shard,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
@@ -69,7 +69,7 @@ except Exception as e:
 
 cmd = """
 awslocal dynamodb create-table \
-    --table-name bexh-outgoing-bets-manager \
+    --table-name bexh-bet-connector-manager \
     --attribute-definitions AttributeName=shard,AttributeType=S \
     --key-schema AttributeName=shard,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
@@ -82,7 +82,7 @@ except Exception as e:
 
 cmd = """
 awslocal dynamodb create-table \
-    --table-name bexh-incoming-aggregated-bets-manager \
+    --table-name bexh-aggregated-bet-info-connector-manager \
     --attribute-definitions AttributeName=shard,AttributeType=S \
     --key-schema AttributeName=shard,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
