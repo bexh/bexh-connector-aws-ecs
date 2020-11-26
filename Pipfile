@@ -9,6 +9,7 @@ awscli-local="*"
 
 [packages]
 boto3="*"
+kinesis-python="*"
 
 [requires]
 python_version = "3.7.7"

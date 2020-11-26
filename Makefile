@@ -22,6 +22,3 @@ docker-down:
 
 local-setup:
 	python scripts/local_setup.py
-
-local-setup:
-	python scripts/local_setup.py
