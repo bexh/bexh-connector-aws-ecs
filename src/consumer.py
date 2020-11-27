@@ -1,5 +1,6 @@
 import os
 from abc import ABC, abstractmethod
+from json import loads
 
 from kinesis.consumer import KinesisConsumer
 from kinesis.state import DynamoDB
@@ -33,7 +34,7 @@ class Consumer(ABC):
             consumer = KinesisConsumer(stream_name=self._kinesis_source_stream_name, state=state, endpoint_url=self._endpoint_url)
             for message in consumer:
                 self._logger.debug(message)
-                self.process(message["Data"].decode("utf-8"))
+                self.process(loads(message["Data"].decode("utf-8")))
 
         except Exception as e:
             self._logger.error(f"Core error: {str(e)}")

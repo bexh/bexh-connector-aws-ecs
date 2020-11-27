@@ -51,7 +51,7 @@ class ES:
     def __init__(self, host: str, port: int):
         self._es = Elasticsearch([{"host": host, "port": port}])
 
-    def store_record(self, index_name: str, record: dict):
-        self._es.index(index=index_name, body=record)
+    def store_record(self, index_name: str, record: dict, doc_type: str):
+        self._es.index(index=index_name, body=record, doc_type=doc_type)
 
 

@@ -22,6 +22,6 @@ def test_es():
           "id": 1,
           "sport": "basketball"
         }
-        es.store_record(index_name="bexh", record=record)
+        es.store_record(index_name="bexh", record=record, doc_type="events")
     except Exception as e:
         print(str(e))
