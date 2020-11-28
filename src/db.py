@@ -54,4 +54,5 @@ class ES:
     def store_record(self, index_name: str, record: dict, doc_type: str):
         self._es.index(index=index_name, body=record, doc_type=doc_type)
 
-
+    def delete_record(self, index_name: str, doc_type: str, query: dict):
+        self._es.delete_by_query(index=index_name, doc_type=doc_type, query=query)
