@@ -30,9 +30,9 @@ class EventConsumer(Consumer):
         dtm = iso_to_mysql_format(iso=event.date)
         try:
             self._mysql.execute("""
-                INSERT INTO EVENT(EVENT_ID, HOME, AWAY, HOME_ABBREV, AWAY_ABBREV, SPORT, DTM)
+                INSERT INTO EVENT(EVENT_ID, HOME, AWAY, HOME_ABBREV, AWAY_ABBREV, SPORT, DTM, STATUS)
                 VALUES
-                    ('%s', '%s', '%s', '%s', '%s', '%s', '%s');
+                    ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'ACTIVE');
             """ % (event.event_id, event.home_team_name, event.away_team_name, event.home_team_abbrev,
                    event.away_team_abbrev, event.sport, dtm))
         except IntegrityError as e:
