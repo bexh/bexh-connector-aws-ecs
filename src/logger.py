@@ -1,19 +1,16 @@
 import logging
 import sys
 import uuid
-from typing import Literal
-
-LogLevel = Literal["INFO", "WARNING", "DEBUG"]
 
 
 class LoggerFactory:
     @staticmethod
-    def get_logger(name: str, log_level: LogLevel = "INFO"):
+    def get_logger(name: str, log_level: str = "INFO"):
         return Logger(name=name, log_level=log_level)
 
 
 class Logger:
-    def __init__(self, name: str, log_level: LogLevel = "INFO"):
+    def __init__(self, name: str, log_level: str = "INFO"):
         self._logger = logging.getLogger(name=name)
         logging_level = self._get_log_level(log_level)
         self._logger.setLevel(logging_level)
@@ -22,7 +19,7 @@ class Logger:
         self._extras = {"RUN_ID": uuid.uuid4()}
 
     @staticmethod
-    def _get_log_level(log_level: LogLevel):
+    def _get_log_level(log_level: str):
         log_level_lookup = {
             "INFO": logging.INFO,
             "WARNING": logging.WARNING,

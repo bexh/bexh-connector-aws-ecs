@@ -6,3 +6,5 @@ main/__pycache__/
 .idea/
 .env
 tmp/
+bexh_connector_aws_ecs.egg-info/
+build/

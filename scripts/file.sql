@@ -95,17 +95,20 @@ CREATE TABLE IF NOT EXISTS EVENT (
 	EVENT_ID VARCHAR(100) NOT NULL,
 	HOME VARCHAR(100) NOT NULL,
 	AWAY VARCHAR(100) NOT NULL,
+	HOME_ABBREV VARCHAR(100) NOT NULL,
+	AWAY_ABBREV VARCHAR(100) NOT NULL,
 	SPORT ENUM('basketball', 'football', 'hockey', 'baseball') NOT NULL,
 	DTM DATETIME NOT NULL,
 	CURRENT_ODDS INTEGER,
+	STATUS ENUM('ACTIVE', 'INACTIVE') NOT NULL,
 	PRIMARY KEY(EVENT_ID)
 );
 
-INSERT INTO EVENT(EVENT_ID, HOME, AWAY, SPORT, DTM, CURRENT_ODDS)
+INSERT INTO EVENT(EVENT_ID, HOME, AWAY, HOME_ABBREV, AWAY_ABBREV, SPORT, DTM, CURRENT_ODDS, STATUS)
 VALUES
-    (1, 'Team 1', 'Team 2', 'basketball', '2020-10-25 10:00:00', 100),
-    (2, 'Team 3', 'Team 4', 'football', '2020-10-26 10:00:00', -200),
-    (3, 'Team 5', 'Team 6', 'football', '2020-09-25 10:00:00', 100);
+    (1, 'Team 1', 'Team 2', 'T1', 'T2', 'basketball', '2020-10-25 10:00:00', 100, 'ACTIVE'),
+    (2, 'Team 3', 'Team 4', 'T3', 'T4', 'football', '2020-10-26 10:00:00', -200, 'ACTIVE'),
+    (3, 'Team 5', 'Team 6', 'T5', 'T6', 'football', '2020-09-25 10:00:00', 100, 'ACTIVE');
 
 
 -- ALTER TABLE ODDS ADD CONSTRAINT FK_ODD FOREIGN KEY (EVENT_ID) REFERENCES EVENT;
@@ -116,9 +119,10 @@ CREATE TABLE IF NOT EXISTS BETS (
 	USER_ID INTEGER NOT NULL,
 	EVENT_ID VARCHAR(100) NOT NULL,
 	MARKET ENUM('exchange', 'social') NOT NULL,
-	ODDS INTEGER NOT NULL,
-	AMOUNT DECIMAL(13,2) NOT NULL,
-	EST_PROFIT DECIMAL (13,2) NOT NULL,
+	SUBMITTED_ODDS INTEGER NOT NULL,
+	SUBMITTED_AMOUNT DECIMAL(13,2) NOT NULL,
+	EXECUTED_ODDS INTEGER,
+	EXECUTED_AMOUNT DECIMAL(13,2) DEFAULT 0.00,
 	ON_TEAM VARCHAR(100) NOT NULL,
 	TYPE ENUM('market', 'limit'),
 	STATUS ENUM('pending', 'submitted', 'partially executed', 'executed', 'completed', 'pending cancel', 'cancelled', 'pending user', 'pending friend', 'active', 'declined') NOT NULL,
@@ -132,13 +136,13 @@ CREATE TABLE IF NOT EXISTS BETS (
 	FOREIGN KEY (USER_ID) REFERENCES USERS(USER_ID)
 );
 
-INSERT INTO BETS(BET_ID, USER_ID, EVENT_ID, MARKET, ODDS, AMOUNT, EST_PROFIT, ON_TEAM, TYPE, STATUS, FRIEND, DTM, WON, PAIRED_BET_ID)
+INSERT INTO BETS(BET_ID, USER_ID, EVENT_ID, MARKET, SUBMITTED_ODDS, SUBMITTED_AMOUNT, EXECUTED_ODDS, EXECUTED_AMOUNT, ON_TEAM, TYPE, STATUS, FRIEND, DTM, WON, PAIRED_BET_ID)
 VALUES
-    (1, 1, 1, 'exchange', 200, 20.00, 40.00, 'Team 1', 'market', 'executed', NULL, '2020-10-01 10:00:00', NULL, NULL),
-    (2, 1, 1, 'social', 100, 10.00, 10.00, 'Team 1', NULL, 'active', 2, '2020-10-01 10:00:00', NULL, 3),
-    (3, 2, 1, 'social', -100, 10.00, 10.00, 'Team 2', NULL, 'active', 1, '2020-10-01 10:00:00', NULL, 2),
-    (4, 1, 1, 'social', -100, 40.00, 40.00, 'Team 2', NULL, 'pending friend', 3,'2020-10-01 10:00:00',  NULL, 5),
-    (5, 3, 1, 'social', 100, 40.00, 40.00, 'Team 1', NULL, 'pending user', 1, '2020-10-01 10:00:00', NULL, 4),
-    (6, 1, 3, 'exchange', 100, 10.00, 10.00, 'Team 5', 'market', 'completed', NULL, '2020-09-22 10:00:00', 1, NULL);
+    (1, 1, 1, 'exchange', 200, 20.00, 200, 20.00, 'Team 1', 'market', 'executed', NULL, '2020-10-01 10:00:00', NULL, NULL),
+    (2, 1, 1, 'social', 100, 10.00, 100, 10.00, 'Team 1', NULL, 'active', 2, '2020-10-01 10:00:00', NULL, 3),
+    (3, 2, 1, 'social', -100, 10.00, -100, 10.00, 'Team 2', NULL, 'active', 1, '2020-10-01 10:00:00', NULL, 2),
+    (4, 1, 1, 'social', -100, 40.00, NULL, 0.00, 'Team 2', NULL, 'pending friend', 3,'2020-10-01 10:00:00',  NULL, 5),
+    (5, 3, 1, 'social', 100, 40.00, NULL, 0.00, 'Team 1', NULL, 'pending user', 1, '2020-10-01 10:00:00', NULL, 4),
+    (6, 1, 3, 'exchange', 100, 10.00, 100, 10.00, 'Team 5', 'market', 'completed', NULL, '2020-09-22 10:00:00', 1, NULL);
 
 
