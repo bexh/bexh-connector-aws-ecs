@@ -1,9 +1,11 @@
-from src.consumer import Consumer
-from src.domain_model import Event
 import os
-from src.db import ES
-from src.utils import iso_to_mysql_format
+
 from pymysql import IntegrityError
+
+from src.consumer import Consumer
+from src.db import ES
+from src.domain_model import Event
+from src.utils import iso_to_mysql_format
 
 
 class EventConsumer(Consumer):
@@ -75,41 +77,3 @@ class EventConsumer(Consumer):
 
         # remove from ES
         self._es.delete_record(index_name="bexh", doc_type="events", query={"id": event.event_id})
-
-        # set won
-        self._mysql.execute("""
-            UPDATE BETS
-            SET WON = 1
-            WHERE EVENT_ID = '%s'
-            AND ON_TEAM = '%s';
-        """ % (event.event_id, event.winning_team_abbrev))
-
-        # set lost
-        self._mysql.execute("""
-            UPDATE BETS
-            SET WON = 0
-            WHERE EVENT_ID = '%s'
-            AND ON_TEAM = '%s';
-        """ % (event.event_id, event.losing_team_abbrev))
-
-        # settle exchange bets
-        self._mysql.execute("""
-            UPDATE USERS u
-            JOIN 
-                (SELECT USER_ID, SUM(AMOUNT_WON) AS USER_AMOUNT_WON FROM
-                (
-                    SELECT USER_ID,
-                    CASE
-                        WHEN EXECUTED_ODDS > 0 THEN ROUND(EXECUTED_AMOUNT * (EXECUTED_ODDS / 100.00), 2)
-                        ELSE ROUND(EXECUTED_AMOUNT / (ABS(EXECUTED_ODDS)/100.00), 2)
-                    END AS AMOUNT_WON
-                    FROM BETS
-                    WHERE EVENT_ID = '%s'
-                    AND ON_TEAM = '%s'
-                    AND EXECUTED_ODDS IS NOT NULL
-                ) t
-                GROUP BY USER_ID
-            ) b
-            ON (u.USER_ID = b.USER_ID)
-            SET u.BALANCE = u.BALANCE + b.USER_AMOUNT_WON;
-        """ % (event.event_id, event.winning_team_abbrev))
