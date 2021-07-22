@@ -6,7 +6,6 @@ verify_ssl = true
 [dev-packages]
 pytest="*"
 awscli-local="*"
-my-package = {editable = true, path = "."}
 
 [packages]
 boto3="*"
