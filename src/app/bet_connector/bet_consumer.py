@@ -1,9 +1,16 @@
+import os
+import boto3
+import json
+
 from src.consumer import Consumer
 from src.domain_model import ExecutedBets, Bet
 
 
 class BetConsumer(Consumer):
     def __init__(self):
+        self._bet_status_change_email_sns_topic_arn = os.environ["BET_STATUS_CHANGE_EMAIL_SNS_TOPIC_ARN"]
+        endpoint_url = os.environ.get("ENDPOINT_URL")
+        self._sns_client = boto3.client('sns', endpoint_url=endpoint_url)
         super(BetConsumer, self).__init__()
 
     def process(self, message):
@@ -47,6 +54,32 @@ class BetConsumer(Consumer):
             bet.odds,
             bet.bet_id
         ))
+
+        email_info = self._mysql.fetch("""
+            SELECT u.EMAIL AS email, u.FIRST_NAME AS first_name, b.ON_TEAM AS 'on', b.EXECUTED_AMOUNT AS amount, b.EXECUTED_ODDS AS odds, e.HOME AS home, e.AWAY AS away, curdate() AS date
+            FROM BETS b
+            LEFT JOIN USERS u
+            ON b.USER_ID = u.USER_ID
+            LEFT JOIN EVENT e
+            ON b.EVENT_ID = e.EVENT_ID
+            WHERE b.BET_ID = %s;
+        """ % bet.bet_id)[0]
+
+        bet_executed_message = {
+            "email": email_info['email'],
+            "first_name": email_info['first_name'],
+            "on": email_info['on'],
+            "home": email_info['home'],
+            "away": email_info['away'],
+            "date": email_info['date'],
+            "amount": email_info['date'],
+            "odds": email_info['odds'],
+        }
+        self._sns_client.publish(
+            TopicArn=self._bet_status_change_email_sns_topic_arn,
+            Message=json.dumps(bet_executed_message),
+            Subject="BET_EXECUTED",
+        )
 
     def _handle_partially_executed(self, bet: Bet):
         self._mysql.execute("""
