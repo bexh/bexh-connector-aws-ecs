@@ -1,3 +1,6 @@
+import datetime
+
+
 class Event:
     def __init__(
         self,
@@ -101,3 +104,16 @@ class ExecutedBets:
                 status=bet.status,
             ))
         return bets
+
+
+class AggregatedBets(object):
+    def __init__(
+        self,
+        ROWTIME: str,
+        event_id: int,
+        odds: float,
+    ):
+        self.row_time = datetime.datetime.strptime(ROWTIME, "%Y-%m-%d %H:%M:%S.%f")
+        self.event_id = event_id
+        self.odds = odds
+
